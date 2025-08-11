@@ -1,0 +1,10 @@
+#!/bin/sh
+echo "Running tests before push..."
+
+if ! docker exec -e CONFIG_PATH=/app/config/local.yaml l0-app-1 go test ./...; then
+  echo "Tests failed. Push aborted."
+  exit 1
+fi
+
+echo "Tests passed. Proceeding with push."
+exit 0

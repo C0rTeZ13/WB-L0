@@ -1,0 +1,150 @@
+openapi: 3.0.3
+info:
+  title: Order Service API
+  version: 1.0.0
+  description: API для получения информации о заказе по ID
+
+servers:
+  - url: http://localhost:8080
+
+paths:
+  /orders/{order_id}:
+    get:
+      summary: Получить заказ по ID
+      description: Возвращает информацию о заказе по его уникальному идентификатору.
+      parameters:
+        - name: order_id
+          in: path
+          description: Уникальный идентификатор заказа
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Заказ успешно найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          description: Некорректный ID заказа
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Заказ не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    Order:
+      type: object
+      properties:
+        order_uid:
+          type: string
+        track_number:
+          type: string
+        entry:
+          type: string
+        locale:
+          type: string
+        internal_signature:
+          type: string
+          nullable: true
+        customer_id:
+          type: string
+        delivery_service:
+          type: string
+        shardkey:
+          type: string
+        sm_id:
+          type: integer
+        date_created:
+          type: string
+          format: date-time
+        oof_shard:
+          type: string
+        delivery:
+          type: object
+          properties:
+            name:
+              type: string
+            phone:
+              type: string
+            zip:
+              type: string
+            city:
+              type: string
+            address:
+              type: string
+            region:
+              type: string
+            email:
+              type: string
+        payment:
+          type: object
+          properties:
+            transaction:
+              type: string
+            request_id:
+              type: string
+              nullable: true
+            currency:
+              type: string
+            provider:
+              type: string
+            amount:
+              type: integer
+            payment_dt:
+              type: integer
+            bank:
+              type: string
+            delivery_cost:
+              type: integer
+            goods_total:
+              type: integer
+            custom_fee:
+              type: integer
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              chrt_id:
+                type: integer
+              track_number:
+                type: string
+              price:
+                type: integer
+              rid:
+                type: string
+              name:
+                type: string
+              sale:
+                type: integer
+              size:
+                type: string
+              total_price:
+                type: integer
+              nm_id:
+                type: integer
+              brand:
+                type: string
+              status:
+                type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
