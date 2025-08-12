@@ -35,9 +35,16 @@ make setup
 docker compose up -d --build
 ```
 
+## Миграции
+
+**Запускать при работающих контейнерах!**
+```bash
+make migrate
+```
+
 ## Тесты
 
-Запускать при работающих контейнерах!
+**Запускать при работающих контейнерах!**
 ```bash
 docker exec -e CONFIG_PATH=/app/config/local.yaml l0-app-1 go test ./...
 ```
