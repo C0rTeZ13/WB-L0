@@ -6,13 +6,14 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/lib/pq"
-	"github.com/segmentio/kafka-go"
 	"log"
 	"time"
+
+	"github.com/lib/pq"
+	"github.com/segmentio/kafka-go"
 )
 
-func ConsumeOrders(brokers []string, topic, groupID string, storage *postgres.Storage) {
+func ConsumeOrders(ctx context.Context, brokers []string, topic, groupID string, storage *postgres.Storage) error {
 	r := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:        brokers,
 		GroupID:        groupID,
@@ -29,37 +30,51 @@ func ConsumeOrders(brokers []string, topic, groupID string, storage *postgres.St
 	}()
 
 	for {
-		m, err := r.ReadMessage(context.Background())
-		if err != nil {
-			log.Printf("error reading message: %v", err)
-			continue
-		}
-
-		var order dto.OrderDTO
-		if err := json.Unmarshal(m.Value, &order); err != nil {
-			log.Printf("invalid message format: %v", err)
-			_ = r.CommitMessages(context.Background(), m)
-			continue
-		}
-
-		for {
-			_, err := postgres.CreateOrder(context.Background(), storage.Client, &order)
+		select {
+		case <-ctx.Done():
+			log.Println("Kafka consumer stopped")
+			return nil
+		default:
+			m, err := r.ReadMessage(ctx)
 			if err != nil {
-				var pgErr *pq.Error
-				if errors.As(err, &pgErr) && pgErr.Code == "23505" {
-					log.Printf("order UID %s already exists, skipping retry. Table: %s, Constraint: %s", order.OrderUID, pgErr.Table, pgErr.Constraint)
-					break
+				if errors.Is(err, context.Canceled) {
+					return nil
 				}
-
-				log.Printf("failed to save order UID %s: %v, retrying...", order.OrderUID, err)
-				time.Sleep(time.Second * 3)
+				log.Printf("error reading message: %v", err)
 				continue
 			}
-			break
-		}
 
-		if err := r.CommitMessages(context.Background(), m); err != nil {
-			log.Printf("failed to commit message: %v", err)
+			var order dto.OrderDTO
+			if err := json.Unmarshal(m.Value, &order); err != nil {
+				log.Printf("invalid message format: %v", err)
+				_ = r.CommitMessages(ctx, m)
+				continue
+			}
+
+			for {
+				_, err := postgres.CreateOrder(ctx, storage.Client, &order)
+				if err != nil {
+					var pgErr *pq.Error
+					if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+						log.Printf("order UID %s already exists, skipping retry. Table: %s, Constraint: %s",
+							order.OrderUID, pgErr.Table, pgErr.Constraint)
+						break
+					}
+
+					log.Printf("failed to save order UID %s: %v, retrying...", order.OrderUID, err)
+					select {
+					case <-ctx.Done():
+						return nil
+					case <-time.After(3 * time.Second):
+						continue
+					}
+				}
+				break
+			}
+
+			if err := r.CommitMessages(ctx, m); err != nil {
+				log.Printf("failed to commit message: %v", err)
+			}
 		}
 	}
 }
