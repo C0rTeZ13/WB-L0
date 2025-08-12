@@ -2,8 +2,10 @@ setup:
 	git config core.hooksPath githooks
 	go run -mod=mod entgo.io/ent/cmd/ent generate ./ent/schema/
 migrate:
-	go run cmd/migrate/main.go up
+	docker exec l0-app-1 go run cmd/migrate/main.go up
 rollback:
-	go run cmd/migrate/main.go down
+	docker exec l0-app-1 go run cmd/migrate/main.go down
 run:
-	go run cmd/app/main.go
+	docker exec l0-app-1 go run cmd/app/main.go
+runTests:
+	docker exec -e CONFIG_PATH=/app/config/local.yaml l0-app-1 go test ./...
