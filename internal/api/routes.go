@@ -11,6 +11,6 @@ import (
 func RegisterRoutes(r *chi.Mux, storage *postgres.Storage, logger *slog.Logger, cache *sync.Map) {
 	orderHandler := &handlers.OrderHandler{Storage: storage, Logger: logger, Cache: cache}
 	r.Route("/orders", func(r chi.Router) {
-		r.Get("/{order_id}", orderHandler.ServeHTTP)
+		r.Get("/{order_uid}", orderHandler.ServeHTTP)
 	})
 }

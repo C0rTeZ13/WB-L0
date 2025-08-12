@@ -8,17 +8,17 @@ servers:
   - url: http://localhost:8080
 
 paths:
-  /orders/{order_id}:
+  /orders/{order_uid}:
     get:
-      summary: Получить заказ по ID
+      summary: Получить заказ по UID
       description: Возвращает информацию о заказе по его уникальному идентификатору.
       parameters:
-        - name: order_id
+        - name: order_uid
           in: path
           description: Уникальный идентификатор заказа
           required: true
           schema:
-            type: integer
+            type: string
       responses:
         '200':
           description: Заказ успешно найден
