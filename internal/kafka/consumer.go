@@ -33,10 +33,8 @@ func ConsumeOrders(brokers []string, topic, groupID string, storage *postgres.St
 
 		var order dto.OrderDTO
 		if err := json.Unmarshal(m.Value, &order); err != nil {
-			log.Printf("failed to unmarshal order: %v", err)
-			if err := r.CommitMessages(context.Background(), m); err != nil {
-				log.Printf("failed to commit message: %v", err)
-			}
+			log.Printf("invalid message format: %v", err)
+			_ = r.CommitMessages(context.Background(), m)
 			continue
 		}
 
