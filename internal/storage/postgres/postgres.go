@@ -1,42 +1,35 @@
 package postgres
 
 import (
-	"L0/ent"
 	"context"
-	"entgo.io/ent/dialect"
-	"entgo.io/ent/dialect/sql"
 	"errors"
 	"fmt"
-	"github.com/golang-migrate/migrate/v4"
 	"log/slog"
+
+	"github.com/golang-migrate/migrate/v4"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
-	_ "github.com/lib/pq"
 )
 
 type Storage struct {
-	Client *ent.Client
+	DB *gorm.DB
 }
 
-func New(host string, port int, user, password, dbname string) (*Storage, error) {
+func New(ctx context.Context, host string, port int, user, password, dbname string) (*Storage, error) {
 	dsn := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname,
 	)
 
-	drv, err := sql.Open(dialect.Postgres, dsn)
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		return nil, fmt.Errorf("failed opening postgres driver: %w", err)
+		return nil, fmt.Errorf("failed opening postgres connection: %w", err)
 	}
 
-	client := ent.NewClient(ent.Driver(drv))
-
-	if err := client.Schema.Create(context.Background()); err != nil {
-		return nil, fmt.Errorf("failed creating schema resources: %w", err)
-	}
-
-	return &Storage{Client: client}, nil
+	return &Storage{DB: db}, nil
 }
 
 func RunMigrations(host string, port int, user, password, dbname string) error {

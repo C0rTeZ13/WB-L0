@@ -3,9 +3,10 @@ package integration
 import (
 	"L0/internal/config"
 	"fmt"
+	"testing"
+
 	"github.com/segmentio/kafka-go"
 	. "github.com/smartystreets/goconvey/convey"
-	"testing"
 )
 
 func TestKafkaConnection(t *testing.T) {

@@ -1,14 +1,13 @@
 package handlers
 
 import (
-	"L0/ent"
-	"L0/ent/order"
 	"L0/internal/storage/postgres"
 	"encoding/json"
-	"github.com/go-chi/chi/v5"
 	"log/slog"
 	"net/http"
 	"sync"
+
+	"github.com/go-chi/chi/v5"
 )
 
 type OrderHandler struct {
