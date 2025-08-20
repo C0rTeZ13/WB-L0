@@ -111,7 +111,7 @@ func (p *orderMessageProcessor) ProcessMessage(ctx context.Context, data []byte,
 					slog.String("order_uid", order.OrderUID),
 					slog.String("table", pgErr.Table),
 					slog.String("constraint", pgErr.Constraint))
-				return nil // Заказ уже существует, не ошибка
+				return nil
 			}
 
 			p.logger.Error("Failed to save order, retrying...",

@@ -4,6 +4,7 @@ import (
 	"L0/internal/kafka/dto"
 	"errors"
 	"fmt"
+	"math"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -29,7 +30,13 @@ func (ve ValidationErrors) Error() string {
 	if len(ve) == 0 {
 		return ""
 	}
-	return fmt.Sprintf("validation failed for %d field(s)", len(ve))
+
+	msg := "validation failed:"
+	for _, e := range ve {
+		msg += fmt.Sprintf(" field=%s tag=%s message=%s value=%s;",
+			e.Field, e.Tag, e.Message, e.Value)
+	}
+	return msg
 }
 
 // NewOrderValidator creates a new order validator
@@ -136,12 +143,14 @@ func (ov *OrderValidator) validateItemsConsistency(order *dto.OrderDTO) error {
 	totalItemsPrice := 0
 	for i, item := range order.Items {
 		// total_price
-		expectedTotal := item.Price - (item.Price * item.Sale / 100)
+		expectedTotal := int(math.Floor(
+			float64(item.Price) * (1 - float64(item.Sale)/100.0),
+		))
 		if item.TotalPrice != expectedTotal {
 			vErrors = append(vErrors, ValidationError{
 				Field: fmt.Sprintf("items[%d].total_price", i),
 				Tag:   "consistency",
-				Message: fmt.Sprintf("total_price (%d) should equal price - sale discount (%d)",
+				Message: fmt.Sprintf("total_price (%d) should equal (price - sale discount) (%d)",
 					item.TotalPrice, expectedTotal),
 			})
 		}

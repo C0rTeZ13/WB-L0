@@ -148,7 +148,7 @@ func convertToDTO(order *models.Order) *dto.OrderDTO {
 	for _, item := range order.Items {
 		o.Items = append(o.Items, dto.ItemDTO{
 			ChrtID:      item.ChrtID,
-			TrackNumber: item.TrackNum,
+			TrackNumber: item.TrackNumber,
 			Price:       item.Price,
 			RID:         item.RID,
 			Name:        item.Name,

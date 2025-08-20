@@ -53,17 +53,17 @@ func CreateOrder(ctx context.Context, db *gorm.DB, o *dto.OrderDTO) (*models.Ord
 		var items []models.Item
 		for _, it := range o.Items {
 			item := models.Item{
-				ChrtID:     it.ChrtID,
-				TrackNum:   it.TrackNumber,
-				Price:      it.Price,
-				RID:        it.RID,
-				Name:       it.Name,
-				Sale:       it.Sale,
-				Size:       it.Size,
-				TotalPrice: it.TotalPrice,
-				NmID:       it.NmID,
-				Brand:      it.Brand,
-				Status:     it.Status,
+				ChrtID:      it.ChrtID,
+				TrackNumber: it.TrackNumber,
+				Price:       it.Price,
+				RID:         it.RID,
+				Name:        it.Name,
+				Sale:        it.Sale,
+				Size:        it.Size,
+				TotalPrice:  it.TotalPrice,
+				NmID:        it.NmID,
+				Brand:       it.Brand,
+				Status:      it.Status,
 			}
 			items = append(items, item)
 		}
@@ -156,7 +156,7 @@ func GetAllOrders(ctx context.Context, db *gorm.DB) ([]dto.OrderDTO, error) {
 		for _, item := range o.Items {
 			order.Items = append(order.Items, dto.ItemDTO{
 				ChrtID:      item.ChrtID,
-				TrackNumber: item.TrackNum,
+				TrackNumber: item.TrackNumber,
 				Price:       item.Price,
 				RID:         item.RID,
 				Name:        item.Name,
@@ -230,7 +230,7 @@ func GetOrderByUID(ctx context.Context, db *gorm.DB, orderUID string) (*dto.Orde
 	for _, item := range order.Items {
 		result.Items = append(result.Items, dto.ItemDTO{
 			ChrtID:      item.ChrtID,
-			TrackNumber: item.TrackNum,
+			TrackNumber: item.TrackNumber,
 			Price:       item.Price,
 			RID:         item.RID,
 			Name:        item.Name,

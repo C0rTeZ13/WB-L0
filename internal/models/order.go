@@ -13,7 +13,7 @@ type Order struct {
 	InternalSignature string `gorm:"type:text"`
 	CustomerID        string `gorm:"type:text;not null"`
 	DeliveryService   string `gorm:"type:text;not null"`
-	ShardKey          string `gorm:"type:text;not null"`
+	ShardKey          string `gorm:"column:shardkey;type:text;not null"`
 	SmID              uint64
 	DateCreated       *time.Time
 	OofShard          string `gorm:"type:text"`

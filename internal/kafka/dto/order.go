@@ -13,6 +13,6 @@ type OrderDTO struct {
 	DeliveryService   string      `json:"delivery_service" validate:"required,min=1,max=50"`
 	Shardkey          string      `json:"shardkey" validate:"required,min=1,max=20"`
 	SmID              uint64      `json:"sm_id" validate:"required,min=1"`
-	DateCreated       string      `json:"date_created" validate:"required,datetime=2006-01-02T15:04:05Z07:00"`
+	DateCreated       string      `json:"date_created" validate:"required,datetime=2006-01-02T15:04:05Z"`
 	OofShard          string      `json:"oof_shard" validate:"required,min=1,max=10"`
 }
