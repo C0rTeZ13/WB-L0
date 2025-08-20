@@ -8,12 +8,15 @@
 
 - `cmd/app` — точка входа приложения
 - `config/local.yaml` — параметры локального окружения (env)
-- `ent/schema` — схемы ent (хранятся в git)
-- `ent/` — сгенерированный ent код (игнорируется в git)
-- `internal/storage/postgres` — работа с БД и миграции
+- `internal/repository/postgres` — работа с БД и миграции
+- `internal/cache` — работа с кэшом
+- `internal/config` — настройки конфига
+- `internal/handlers` — хэндлеры (контроллеры)
+- `internal/models` — работа с моделями
 - `internal/kafka` — работа с Kafka
-- `internal/handlers` — Хэндлеры (контроллеры)
-- `githooks/` — git hooks (pre-push)
+- `internal/service` — бизнес-логика
+- `test/` — тесты
+- `githooks/` — git hooks (pre-push, pre-commit)
 - `docker-compose.yaml` — локальное окружение (Postgres, Kafka и пр.)
 - `Makefile` — команды для разработки и запуска
 

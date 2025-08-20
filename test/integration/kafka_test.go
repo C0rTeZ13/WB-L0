@@ -6,37 +6,27 @@ import (
 	"testing"
 
 	"github.com/segmentio/kafka-go"
-	. "github.com/smartystreets/goconvey/convey"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestKafkaConnection(t *testing.T) {
-	Convey("Given a running Kafka broker", t, func() {
-		cfg := config.MustLoad()
-		brokers := cfg.Kafka.Brokers
+	cfg := config.MustLoad()
+	brokers := cfg.Kafka.Brokers
 
-		Convey("When connecting to Kafka", func() {
-			conn, err := kafka.Dial("tcp", brokers[0])
+	conn, err := kafka.Dial("tcp", brokers[0])
 
-			Convey("Then the connection should succeed", func() {
-				So(err, ShouldBeNil)
-				So(conn, ShouldNotBeNil)
-			})
+	require.NoError(t, err, "Failed to connect to Kafka")
+	require.NotNil(t, conn, "Connection should not be nil")
 
-			if err == nil {
-				defer func(conn *kafka.Conn) {
-					err := conn.Close()
-					if err != nil {
-						fmt.Printf("Failed to close connection")
-					}
-				}(conn)
+	defer func(conn *kafka.Conn) {
+		err := conn.Close()
+		if err != nil {
+			fmt.Printf("Failed to close connection: %v", err)
+		}
+	}(conn)
 
-				Convey("And Kafka should return partitions metadata", func() {
-					partitions, err := conn.ReadPartitions()
-					So(err, ShouldBeNil)
-
-					So(partitions, ShouldNotBeNil)
-				})
-			}
-		})
-	})
+	partitions, err := conn.ReadPartitions()
+	assert.NoError(t, err, "Failed to read partitions")
+	assert.NotNil(t, partitions, "Partitions should not be nil")
 }

@@ -2,7 +2,7 @@ package main
 
 import (
 	"L0/internal/config"
-	"L0/internal/storage/postgres"
+	"L0/internal/repository/postgres"
 	"log/slog"
 	"os"
 

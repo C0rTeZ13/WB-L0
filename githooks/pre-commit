@@ -1,0 +1,13 @@
+#!/bin/sh
+echo "Running goimports and tidy before commit..."
+
+# Run both commands and check for failures
+if ! goimports -w . && go mod tidy; then
+    echo "Formatting failed. Commit aborted."
+    exit 1
+fi
+
+git add -u
+
+echo "Formatting passed. Proceeding with commit."
+exit 0
